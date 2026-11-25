@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Новая заявка','catalog',~{::main})}">
+<body>
+<main>
+    <a class="back" th:href="@{/templates}">← К шаблонам</a>
+    <header class="page-heading"><div><h1 th:text="${snapshot.definition.title}">Новая заявка</h1><p th:text="${snapshot.definition.summary}"></p></div><span class="version" th:text="|Версия ${snapshot.number}|"></span></header>
+    <form class="panel form-stack limit" th:action="@{/start/{id}(id=${snapshot.templateId})}" method="post">
+        <input type="hidden" name="version" th:value="${snapshot.number}">
+        <input type="hidden" name="nonce" th:value="${nonce}">
+        <th:block th:each="field : ${snapshot.definition.fields}">
+            <label>
+                <span th:text="${field.label}"></span><span th:if="${field.required}" class="required" aria-hidden="true"> *</span>
+                <th:block th:switch="${field.type.name()}">
+                    <textarea th:case="'TEXT'" th:name="|value_${field.key}|" th:required="${field.required}" maxlength="2000" rows="3" th:text="${values.get(field.key)}"></textarea>
+                    <input th:case="'NUMBER'" th:name="|value_${field.key}|" th:required="${field.required}" inputmode="decimal" type="text" maxlength="18" th:value="${values.get(field.key)}">
+                    <select th:case="'SELECT'" th:name="|value_${field.key}|" th:required="${field.required}">
+                        <option value="">Выберите вариант</option>
+                        <option th:each="option : ${field.choices}" th:value="${option}" th:text="${option}" th:selected="${option == values.get(field.key)}"></option>
+                    </select>
+                </th:block>
+            </label>
+        </th:block>
+        <div class="form-actions"><a class="button quiet" th:href="@{/templates}">Отмена</a><button class="button primary" type="submit">Запустить заявку <span aria-hidden="true">→</span></button></div>
+    </form>
+</main>
+</body>
+</html>

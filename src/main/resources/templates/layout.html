@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:fragment="shell(title, area, content)">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title th:text="|${title} · Конструктор|">Конструктор рабочих процессов</title>
+    <link rel="stylesheet" th:href="@{/assets/app.css}">
+    <script th:src="@{/assets/editor.js}" defer></script>
+    <th:block th:if="${area == 'editor' || area == 'mine'}">
+        <link rel="stylesheet" th:href="@{/assets/process-map.css}">
+        <script th:src="@{/assets/process-map.js}" defer></script>
+    </th:block>
+</head>
+<body>
+<a class="skip-link" href="#content">Перейти к содержимому</a>
+<div class="shell">
+    <header class="masthead">
+        <a th:href="@{/}" class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#route"></use></svg></span><span>Конструктор<small>Рабочие процессы</small></span></a>
+        <div class="identity" th:if="${actor != null}">
+            <span class="identity-avatar" aria-hidden="true" th:text="${#strings.substring(actor.name, 0, 1)}">А</span>
+            <span class="identity-name"><strong th:text="${actor.name}">Сотрудник</strong><small th:text="${actor.role.label()}">Роль</small></span>
+            <form th:action="@{/logout}" method="post"><button type="submit" class="text-button" aria-label="Выйти" title="Выйти"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#log-out"></use></svg></button></form>
+        </div>
+    </header>
+    <aside class="rail" th:if="${actor != null}">
+        <nav class="navigation" aria-label="Основная навигация">
+            <a th:href="@{/}" th:aria-current="${area == 'home'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#grid"></use></svg>Обзор</a>
+            <a th:href="@{/inbox}" th:aria-current="${area == 'inbox'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#inbox"></use></svg>Входящие</a>
+            <a th:href="@{/templates}" th:aria-current="${area == 'catalog'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#play"></use></svg>Запустить процесс</a>
+            <a th:href="@{/requests}" th:aria-current="${area == 'mine'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#file"></use></svg>Мои заявки</a>
+            <a th:href="@{/requests(view='journal')}" th:aria-current="${area == 'journal'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#history"></use></svg>Журнал</a>
+            <div class="admin-nav" th:if="${actor.administrator()}">
+                <span>Управление</span>
+                <a th:href="@{/admin/templates}" th:aria-current="${area == 'editor'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#branch"></use></svg>Шаблоны</a>
+                <a th:href="@{/admin/people}" th:aria-current="${area == 'people'} ? 'page' : null"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#users"></use></svg>Сотрудники</a>
+            </div>
+        </nav>
+    </aside>
+    <div id="content" class="workspace" tabindex="-1">
+        <p th:if="${notice != null}" class="banner banner-ok" role="status" th:text="${notice}"></p>
+        <p th:if="${error != null}" class="banner banner-error" role="alert" th:text="${error}"></p>
+        <th:block th:replace="${content}"></th:block>
+    </div>
+</div>
+</body>
+</html>

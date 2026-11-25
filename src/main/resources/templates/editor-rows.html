@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+<fieldset th:fragment="field(row)" class="editor-row" data-field-row>
+    <legend>Поле <span data-number></span></legend>
+    <div class="row-toolbar">
+        <button type="button" class="button small quiet" data-move="up" aria-label="Поле выше">↑</button>
+        <button type="button" class="button small quiet" data-move="down" aria-label="Поле ниже">↓</button>
+        <button type="button" class="button small quiet danger" data-remove>Убрать</button>
+    </div>
+    <div class="form-grid">
+        <label>Название<input name="fieldLabel" required maxlength="100" th:value="${row.label}"></label>
+        <label>Ключ поля<input name="fieldKey" data-field-key required maxlength="32" pattern="[a-z][a-z0-9_]{0,31}" th:value="${row.key}"></label>
+        <label>Тип<select name="fieldType" data-field-type>
+            <option th:each="kind : ${fieldTypes}" th:value="${kind.name()}" th:text="${kind.label()}" th:selected="${kind == row.type}"></option>
+        </select></label>
+        <label>Обязательное<select name="fieldRequired" data-field-required>
+            <option value="true" th:selected="${row.required}">Да</option><option value="false" th:selected="${!row.required}">Нет</option>
+        </select></label>
+        <label class="grid-full" data-field-options>Варианты выбора<textarea name="fieldChoices" rows="3" maxlength="2020"
+            placeholder="По одному варианту в строке" th:text="${row.choicesText()}"></textarea></label>
+    </div>
+</fieldset>
+<fieldset th:fragment="step(row)" class="editor-row" data-step-row>
+    <legend>Этап <span data-number></span></legend>
+    <div class="row-toolbar">
+        <button type="button" class="button small quiet" data-move="up" aria-label="Этап выше">↑</button>
+        <button type="button" class="button small quiet" data-move="down" aria-label="Этап ниже">↓</button>
+        <button type="button" class="button small quiet danger" data-remove>Убрать</button>
+    </div>
+    <div class="form-grid">
+        <label>Название<input name="stepName" required maxlength="140" th:value="${row.name}"></label>
+        <label>Действие<select name="stepKind">
+            <option th:each="kind : ${stepKinds}" th:text="${kind.label()}" th:value="${kind.name()}" th:selected="${kind == row.kind}"></option>
+        </select></label>
+        <label>Ответственный<select name="stepAssignee" required>
+            <option value="">Выберите человека или роль</option>
+            <optgroup label="Роли"><option th:each="role : ${roles}" th:value="|role:${role.name()}|" th:text="${role.label()}"
+                th:selected="${row.assignee == ('role:' + role.name())}"></option></optgroup>
+            <optgroup label="Сотрудники"><option th:each="person : ${people}" th:value="|person:${person.id}|" th:text="|${person.name} · ${person.role.label()}|"
+                th:selected="${row.assignee == ('person:' + person.id)}"></option></optgroup>
+        </select></label>
+        <label>Срок, часов<input name="stepHours" type="number" min="1" max="720" required th:value="${row.hours}"></label>
+    </div>
+    <div class="rule-grid">
+        <label>Включать этап<select name="ruleField" data-rule-field>
+            <option value="">Всегда</option>
+            <option th:each="candidate : ${definition.fields}" th:if="${candidate.type.name() == 'NUMBER' && candidate.required}"
+                th:value="${candidate.key}" th:text="${candidate.label}"
+                th:selected="${row.rule != null && row.rule.field == candidate.key}"></option>
+        </select></label>
+        <label data-rule-detail>Сравнение<select name="ruleOperator">
+            <option th:each="operator : ${operators}" th:value="${operator.name()}" th:text="${operator.label()}"
+                th:selected="${row.rule != null && row.rule.operator == operator}"></option>
+        </select></label>
+        <label data-rule-detail>Порог<input name="ruleThreshold" inputmode="decimal" maxlength="18"
+            th:value="${row.rule == null ? '' : row.rule.threshold.toPlainString()}"></label>
+    </div>
+</fieldset>
+</body>
+</html>

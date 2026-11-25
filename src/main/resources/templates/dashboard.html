@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Обзор','home',~{::main})}">
+<body>
+<main>
+    <header class="workbench-header">
+        <div class="workbench-copy"><h1>Рабочий стол</h1><p>Проверьте, что ждёт решения, или запустите новую заявку.</p>
+            <a class="button primary" th:href="@{/templates}"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#plus"></use></svg>Новая заявка</a>
+        </div>
+        <ol class="workbench-route" aria-label="Порядок работы с заявкой">
+            <li><span class="workbench-node"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#file"></use></svg></span><strong>Запуск</strong><small>Форма заявки</small></li>
+            <li><span class="workbench-node"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#branch"></use></svg></span><strong>Решение</strong><small>Этапы и условия</small></li>
+            <li><span class="workbench-node"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#check"></use></svg></span><strong>Итог</strong><small>История заявки</small></li>
+        </ol>
+    </header>
+    <section class="metrics" aria-label="Заявки">
+        <a class="metric focus" th:href="@{/inbox}"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#inbox"></use></svg><span>Во входящих</span><strong th:text="${inboxCount}">0</strong><small>Открыть очередь →</small></a>
+        <a class="metric" th:href="@{/inbox}"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#clock"></use></svg><span>Просрочено во входящих</span><strong th:classappend="${overdueCount > 0} ? 'overdue' : ''" th:text="${overdueCount}">0</strong><small>Дедлайны текущих этапов</small></a>
+        <a class="metric" th:href="@{/requests}"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#file"></use></svg><span>Мои заявки</span><strong th:text="${mineCount}">0</strong><small>Все мои запуски →</small></a>
+    </section>
+    <section class="panel">
+        <div class="panel-heading"><h2>Первые во входящих</h2><a class="text-link" th:href="@{/inbox}">Все входящие →</a></div>
+        <div th:replace="~{components :: queue(${inbox})}"></div>
+    </section>
+    <section class="panel transparent" th:unless="${#lists.isEmpty(published)}">
+        <div class="panel-heading"><h2>Доступные процессы</h2></div>
+        <div class="catalog-grid"><th:block th:each="item : ${published}"><article th:replace="~{components :: card(${item})}"></article></th:block></div>
+    </section>
+</main>
+</body>
+</html>

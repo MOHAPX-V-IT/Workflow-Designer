@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Сотрудники','people',~{::main})}">
+<body>
+<main>
+    <header class="page-heading"><div><h1>Сотрудники</h1><p>Создавайте аккаунты для участников процессов.</p></div></header>
+    <div class="details-grid">
+        <section class="panel table-scroll"><div class="panel-heading"><h2>Участники</h2></div>
+            <table class="data-table"><thead><tr><th scope="col">Имя</th><th scope="col">Роль</th></tr></thead>
+                <tbody><tr th:each="person : ${people}">
+                    <td><strong th:text="${person.name}"></strong><small th:text="${person.email}"></small></td><td data-label="Роль" th:text="${person.role.label()}"></td>
+                </tr></tbody>
+            </table>
+        </section>
+        <section class="panel"><div class="panel-heading"><h2>Добавить сотрудника</h2></div>
+            <form class="form-stack" th:action="@{/admin/people}" method="post">
+                <label>Имя<input name="name" maxlength="100" required></label>
+                <label>Рабочая почта<input name="email" type="email" maxlength="150" required autocomplete="off"></label>
+                <label>Роль<select name="role"><option th:each="role : ${roles}" th:value="${role.name()}" th:text="${role.label()}" th:selected="${role.name() == 'EMPLOYEE'}"></option></select></label>
+                <label>Начальный пароль<input name="password" type="password" required minlength="14" maxlength="72" autocomplete="new-password"></label>
+                <button class="button primary" type="submit">Сохранить сотрудника</button>
+            </form>
+        </section>
+    </div>
+</main>
+</body>
+</html>

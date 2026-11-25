@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Редактор шаблона','editor',~{::main})}">
+<body>
+<main class="editor-page">
+    <a class="back" th:href="@{/admin/templates}">← К шаблонам</a>
+    <header class="page-heading"><div><h1 th:text="${templateId == null ? 'Новый шаблон' : 'Редактор шаблона'}"></h1>
+        <p>Настройте форму заявки и порядок действий. У запущенной заявки сохранится её версия маршрута.</p></div><span class="version" th:text="|Черновик ${revision}|"></span></header>
+    <form id="blueprint-editor" class="editor-grid" th:action="${templateId == null} ? @{/admin/templates/new} : @{/admin/templates/{id}(id=${templateId})}" method="post">
+        <input type="hidden" name="revision" th:value="${revision}">
+        <div class="details-stack editor-palette">
+            <section class="panel form-stack">
+                <div class="panel-heading"><h2><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#file"></use></svg>Шаблон</h2></div>
+                <label>Название<input name="title" maxlength="140" th:value="${definition.title}" required></label>
+                <label>Описание<textarea name="summary" maxlength="600" rows="3" th:text="${definition.summary}"></textarea></label>
+            </section>
+            <section class="panel">
+                <div class="panel-heading"><h2>Поля формы</h2><button class="button quiet small" type="button" id="add-field">+ Поле</button></div>
+                <div class="editor-rows" id="field-rows">
+                    <th:block th:each="field : ${definition.fields}"><fieldset th:replace="~{editor-rows :: field(${field})}"></fieldset></th:block>
+                </div>
+            </section>
+            <section class="panel" th:unless="${#lists.isEmpty(versions)}">
+                <div class="panel-heading"><h2>Опубликованные версии</h2></div>
+                <ul class="version-list">
+                    <li th:each="version : ${versions}"><span th:text="|Версия ${version.number}|"></span><time th:text="${dates.label(version.publishedAt)}"></time></li>
+                </ul>
+            </section>
+        </div>
+        <section class="route-canvas" aria-labelledby="route-canvas-title">
+            <div class="canvas-head">
+                <div><h2 id="route-canvas-title"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#branch"></use></svg>Маршрут</h2>
+                    <p>Задайте исполнителей, сроки и условия перехода.</p></div>
+                <button class="button primary small" type="button" id="add-step">+ Этап</button>
+            </div>
+            <section th:replace="~{process-map :: map('editor')}"></section>
+            <div class="canvas-body">
+                <div class="flow-cap"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#play"></use></svg>Заявка отправлена</div>
+                <div class="editor-rows route-nodes" id="step-rows">
+                    <th:block th:each="step : ${definition.steps}"><fieldset th:replace="~{editor-rows :: step(${step})}"></fieldset></th:block>
+                </div>
+                <div class="flow-cap"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#check"></use></svg>Маршрут завершён</div>
+            </div>
+        </section>
+        <div class="form-actions editor-actions">
+            <a class="button quiet" th:href="@{/admin/templates}">К шаблонам</a>
+            <button class="button quiet" name="save" value="draft" type="submit">Сохранить черновик</button>
+            <button class="button primary" name="save" value="publish" type="submit">Опубликовать версию</button>
+        </div>
+        <template id="field-template"><fieldset th:replace="~{editor-rows :: field(${blankField})}"></fieldset></template>
+        <template id="step-template"><fieldset th:replace="~{editor-rows :: step(${blankStep})}"></fieldset></template>
+    </form>
+</main>
+</body>
+</html>

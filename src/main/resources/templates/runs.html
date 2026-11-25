@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell(${title},${section},~{::main})}">
+<body>
+<main>
+    <header class="page-heading"><div><h1 th:text="${title}">Заявки</h1><p th:text="${description}"></p></div><a class="button primary" th:href="@{/templates}">Новая заявка <span aria-hidden="true">→</span></a></header>
+    <section class="panel"><div th:replace="~{components :: queue(${runs})}"></div></section>
+</main>
+</body>
+</html>

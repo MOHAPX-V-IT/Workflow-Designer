@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Вход · Конструктор рабочих процессов</title>
+    <link rel="stylesheet" th:href="@{/assets/app.css}">
+</head>
+<body class="login-body">
+<main class="login-frame">
+    <section class="login-intro">
+        <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#route"></use></svg></span><span>Конструктор<small>Рабочие процессы</small></span></div>
+        <div>
+            <h1>Заявки идут по вашему маршруту.</h1>
+            <p>Один шаблон связывает форму, решения и работу исполнителей.</p>
+        </div>
+        <div class="route-example" aria-hidden="true"><span></span><i></i><span></span><i></i><span></span></div>
+    </section>
+    <section class="login-form">
+        <h2>Войти</h2>
+        <p class="muted">Используйте свою рабочую учётную запись.</p>
+        <p th:if="${param.error}" class="banner banner-error" role="alert">Проверьте почту и пароль.</p>
+        <p th:if="${param.logout}" class="banner banner-ok" role="status">Вы вышли из системы.</p>
+        <form th:action="@{/login}" method="post" class="form-stack">
+            <label>Рабочая почта<input name="email" type="email" required autocomplete="username"></label>
+            <label>Пароль<input name="password" type="password" required autocomplete="current-password"></label>
+            <button class="button primary" type="submit">Войти <span aria-hidden="true">→</span></button>
+        </form>
+        <details class="demo-help" th:if="${demo}">
+            <summary>Демонстрационные аккаунты</summary>
+            <p>Пароль для демо <code>WorkshopDemo!2026</code></p>
+            <dl><dt>Администратор</dt><dd>admin@process.test</dd>
+                <dt>Сотрудник</dt><dd>employee@process.test</dd>
+                <dt>Согласующий</dt><dd>approver@process.test</dd>
+                <dt>Исполнитель</dt><dd>executor@process.test</dd></dl>
+        </details>
+    </section>
+</main>
+</body>
+</html>

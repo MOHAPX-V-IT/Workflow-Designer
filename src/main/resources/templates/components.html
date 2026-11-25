@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="queue(rows)" class="table-scroll">
+    <table class="data-table" role="table" th:unless="${#lists.isEmpty(rows)}">
+        <thead role="rowgroup"><tr role="row"><th role="columnheader" scope="col">Заявка</th><th role="columnheader" scope="col">Текущий этап</th><th role="columnheader" scope="col">Ответственный</th><th role="columnheader" scope="col">Срок</th><th role="columnheader" scope="col">Статус</th></tr></thead>
+        <tbody role="rowgroup">
+        <tr role="row" th:each="run : ${rows}">
+            <td role="cell"><a class="table-link" th:href="@{/requests/{id}(id=${run.id})}" th:text="${run.definition.title}">Шаблон</a><small th:text="|№${run.id} · версия ${run.templateVersion}|"></small></td>
+            <td role="cell" data-label="Текущий этап" th:text="${run.currentStep() == null ? '—' : run.currentStep().name}"></td>
+            <td role="cell" data-label="Ответственный" th:text="${run.assigneeLabel()}"></td>
+            <td role="cell" data-label="Срок" th:classappend="${run.overdue()} ? ' overdue' : ''">
+                <span th:text="${dates.label(run.dueAt)}"></span>
+                <small th:if="${run.overdue()}">Просрочено</small>
+            </td>
+            <td role="cell" data-label="Статус"><span class="status" th:attr="data-state=${run.state.name()}" th:text="${run.state.label()}"></span></td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(rows)}">Заявок пока нет.</p>
+</div>
+<article th:fragment="card(version)" class="catalog-card">
+    <div class="catalog-card-meta"><span class="catalog-icon"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#branch"></use></svg></span><span class="version" th:text="|Версия ${version.number}|"></span></div>
+    <h2 th:text="${version.definition.title}"></h2>
+    <p th:if="${!#strings.isEmpty(version.definition.summary)}" th:text="${version.definition.summary}"></p>
+    <a class="button quiet" th:href="@{/start/{id}(id=${version.templateId},version=${version.number})}">Заполнить заявку <span aria-hidden="true">→</span></a>
+</article>
+</body>
+</html>

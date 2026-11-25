@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Шаблоны','editor',~{::main})}">
+<body>
+<main>
+    <header class="page-heading"><div><h1>Шаблоны</h1><p>Настройте форму, правила и этапы процесса.</p></div><a class="button primary" th:href="@{/admin/templates/new}">Создать шаблон</a></header>
+    <section class="panel table-scroll">
+        <table class="data-table" th:unless="${#lists.isEmpty(templates)}">
+            <thead><tr><th scope="col">Шаблон</th><th scope="col">Опубликовано</th><th scope="col">Обновлено</th></tr></thead>
+            <tbody><tr th:each="item : ${templates}">
+                <td><a class="table-link" th:href="@{/admin/templates/{id}(id=${item.id})}" th:text="${item.definition.title}"></a><small th:text="|Редакция черновика ${item.revision}|"></small></td>
+                <td data-label="Опубликовано"><span class="version" th:text="${item.published == 0 ? 'Черновик' : 'Версия ' + item.published}"></span></td>
+                <td data-label="Обновлено" th:text="${dates.label(item.updatedAt)}"></td>
+            </tr></tbody>
+        </table>
+        <p class="empty" th:if="${#lists.isEmpty(templates)}">Создайте шаблон, чтобы настроить первый процесс.</p>
+    </section>
+</main>
+</body>
+</html>

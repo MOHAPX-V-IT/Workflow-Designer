@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Запустить процесс','catalog',~{::main})}">
+<body>
+<main>
+    <header class="page-heading"><div><h1>Запустить процесс</h1><p>Выберите опубликованный шаблон для новой заявки.</p></div></header>
+    <p class="empty panel" th:if="${#lists.isEmpty(published)}">Шаблонов пока нет. После публикации они появятся здесь.</p>
+    <div class="catalog-grid"><th:block th:each="item : ${published}"><article th:replace="~{components :: card(${item})}"></article></th:block></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Заявка','mine',~{::main})}">
+<body>
+<main th:with="run=${detail.run}">
+    <a class="back" th:href="@{/requests(view='journal')}">← К журналу</a>
+    <header class="page-heading">
+        <div><div class="request-meta" th:text="|Заявка №${run.id} · версия ${run.templateVersion}|"></div><h1 th:text="${run.definition.title}"></h1><p th:text="|Инициатор: ${run.creatorName}|"></p></div>
+        <span class="status" th:attr="data-state=${run.state.name()}" th:text="${run.state.label()}"></span>
+    </header>
+    <div class="details-grid">
+        <div class="details-stack">
+            <section class="panel"><div class="panel-heading"><h2><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#file"></use></svg>Данные заявки</h2></div>
+                <dl class="request-values">
+                    <th:block th:each="field : ${run.definition.fields}">
+                        <dt th:text="${field.label}"></dt><dd th:text="${#strings.isEmpty(run.values.get(field.key)) ? '—' : run.values.get(field.key)}"></dd>
+                    </th:block>
+                </dl>
+            </section>
+            <section class="panel">
+                <div class="panel-heading"><h2><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#history"></use></svg>История</h2></div>
+                <ol class="timeline">
+                    <li th:each="event : ${detail.events}" th:attr="data-action=${event.action.name()}">
+                        <span class="timeline-dot" aria-hidden="true">
+                            <svg class="icon" th:switch="${event.action.name()}">
+                                <use th:case="'START'" href="/assets/icons.svg#play"></use>
+                                <use th:case="'REJECT'" href="/assets/icons.svg#x"></use>
+                                <use th:case="*" href="/assets/icons.svg#check"></use>
+                            </svg>
+                        </span>
+                        <div><strong th:text="${event.action.label()}"></strong><time th:text="${dates.label(event.at)}"></time></div>
+                        <p><span th:text="${event.actorName}"></span><span th:if="${event.stepName != null}" th:text="| · ${event.stepName}|"></span></p>
+                        <blockquote th:unless="${#strings.isEmpty(event.note)}" th:text="${event.note}"></blockquote>
+                    </li>
+                </ol>
+            </section>
+        </div>
+        <div class="details-stack">
+            <section class="panel current-panel" th:if="${run.currentStep() != null}">
+                <div class="panel-heading"><h2><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#clock"></use></svg>Текущий этап</h2></div>
+                <h3 th:text="${run.currentStep().name}"></h3>
+                <dl class="request-values compact"><dt>Ответственный</dt><dd th:text="${run.assigneeLabel()}"></dd>
+                    <dt>Срок</dt><dd th:classappend="${run.overdue()} ? ' overdue' : ''" th:text="${dates.label(run.dueAt)}"></dd></dl>
+                <p th:if="${run.overdue()}" class="muted overdue">Изначальный срок этапа уже прошёл.</p>
+                <form th:if="${detail.canAct}" method="post" th:action="@{/requests/{id}/advance(id=${run.id})}" class="form-stack">
+                    <input type="hidden" name="version" th:value="${run.version}">
+                    <label>Комментарий<textarea name="note" maxlength="1000" rows="3" placeholder="При отказе укажите причину"></textarea></label>
+                    <div class="form-actions" th:if="${run.currentStep().kind.name() == 'APPROVAL'}">
+                        <button class="button quiet danger" name="decision" value="REJECT" type="submit">Отклонить</button>
+                        <button class="button primary" name="decision" value="APPROVE" type="submit">Согласовать</button>
+                    </div>
+                    <button th:if="${run.currentStep().kind.name() == 'WORK'}" class="button primary" name="decision" value="COMPLETE" type="submit">Отметить выполненным</button>
+                </form>
+            </section>
+            <section class="panel route-panel">
+                <div class="panel-heading"><h2><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#branch"></use></svg>Маршрут</h2></div>
+                <section th:replace="~{process-map :: map('request')}"></section>
+                <details class="route-order" open>
+                <summary>Этапы списком</summary>
+                <ol class="step-list">
+                    <li th:each="step, loop : ${run.definition.steps}"
+                        th:with="position=${reachable.indexOf(loop.index)}, skip=${position &lt; 0}, current=${run.stepIndex != null && loop.index == run.stepIndex}, denied=${run.state.name() == 'REJECTED' && position == detail.events.size() - 2}, done=${!skip && (run.state.name() == 'COMPLETED' || (run.stepIndex != null && loop.index &lt; run.stepIndex) || (run.state.name() == 'REJECTED' && position &lt; detail.events.size() - 2))}"
+                        th:attr="data-progress=${skip ? 'skipped' : current ? 'current' : denied ? 'denied' : done ? 'done' : 'pending'},data-kind=${step.kind.label()},data-hours=${step.hours},data-assignee=${current ? run.assigneeLabel() : null},data-due=${current ? dates.label(run.dueAt) : null}"
+                        th:classappend="${current} ? 'current' : ''" th:aria-current="${current} ? 'step' : null">
+                        <span class="step-dot" aria-hidden="true">
+                            <svg class="icon" th:if="${done}"><use href="/assets/icons.svg#check"></use></svg>
+                            <svg class="icon" th:if="${denied}"><use href="/assets/icons.svg#x"></use></svg>
+                            <span th:unless="${done || denied}" th:text="${loop.count}"></span>
+                        </span>
+                        <span><strong th:text="${step.name}"></strong>
+                            <small th:text="${skip ? 'Пропущен по условию' : current ? 'Текущий этап' : denied ? 'Отклонён' : done ? 'Пройден' : step.kind.label()}"></small>
+                        </span>
+                    </li>
+                </ol>
+                </details>
+            </section>
+        </div>
+    </div>
+</main>
+</body>
+</html>

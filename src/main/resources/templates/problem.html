@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: shell('Действие не выполнено','',~{::main})}">
+<body>
+<main>
+    <header class="page-heading"><div><h1>Действие не выполнено</h1><p th:text="${message}"></p></div></header>
+    <a class="button primary" th:href="@{/}">На рабочий стол</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section class="process-map" data-orbit th:fragment="map(mode)" th:attr="data-orbit=${mode}" aria-label="Карта процесса" hidden>
+    <div class="orbit-toolbar">
+        <h3>Карта процесса</h3>
+        <button type="button" class="orbit-control" data-orbit-play aria-pressed="false">Вращение</button>
+    </div>
+    <div class="orbit-stage" data-orbit-stage>
+        <div class="orbit-ring" aria-hidden="true"></div>
+        <svg class="orbit-links" data-orbit-links aria-hidden="true" focusable="false"></svg>
+        <div class="orbit-core" aria-hidden="true">
+            <svg class="icon"><use href="/assets/icons.svg#route"></use></svg>
+        </div>
+        <div class="orbit-nodes" data-orbit-nodes role="group" aria-label="Этапы на карте"></div>
+    </div>
+    <p class="orbit-hint" data-orbit-hint>Выберите этап, чтобы посмотреть детали.</p>
+    <article class="orbit-detail" id="orbit-detail" data-orbit-detail hidden>
+        <header>
+            <div>
+                <span data-orbit-status></span>
+                <h4 data-orbit-title aria-live="polite"></h4>
+            </div>
+            <button type="button" class="orbit-close" data-orbit-close aria-label="Закрыть детали этапа">
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#x"></use></svg>
+            </button>
+        </header>
+        <p data-orbit-meta></p>
+        <p data-orbit-condition hidden></p>
+        <div class="orbit-related" data-orbit-related></div>
+        <button type="button" class="orbit-control orbit-edit" data-orbit-edit>Перейти к настройкам этапа</button>
+    </article>
+</section>
+</body>
+</html>
